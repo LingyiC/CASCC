@@ -25,7 +25,7 @@ comparison.}
 between two attractors.}
 }
 \description{
-This function helps remove identical or similar attractors from a list of
+This function helps remove identical or duplicate attractors from a list of
 attractors.
 }
 \author{

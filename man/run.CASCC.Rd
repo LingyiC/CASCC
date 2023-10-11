@@ -57,14 +57,11 @@ clusters will be suggested by CASCC attractor output.}
 \item{fs.res}{Output of \code{\link{CASCC.featureSelection}}. Step
 1 to step 3 of CASCC.} \item{res.predictK}{Output of
 \code{\link{predictClusterK}}. Step 4 of CASCC.} \item{res.kmeans}{Output
-of run.kmeans function. Step 5.1 of CASCC. Kmeans with random centers.
+of run.kmeans function. Kmeans with random centers.
 }
-\item{mainType.output}{Output of \code{\link{kmeansCenterModify}}. Step 5.2
+\item{mainType.output}{Output of \code{\link{kmeansCenterModify}}. Step 5
 of CASCC. Kmeans with fixed centers. }
 }
 \description{
 Run the CASCC package with one line of code.
-}
-\author{
-Lingyi Cai
 }

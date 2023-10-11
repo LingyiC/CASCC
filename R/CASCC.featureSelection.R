@@ -22,7 +22,7 @@
 ##' Default is 50.
 ##' @param removeMT.RP.ERCC If remove mitochondrial genes, ribosomal genes and
 ##' spike-in genes from the analysis. Default is TRUE.
-##' @param topN.DEG.as.seed The Number of top DEGs to use as seeds. Default is
+##' @param topN.DEG.as.seed The Number of top DEGs in each cluster to use as seeds. Default is
 ##' 1.
 ##' @param removeNonProtein If remove non-protein coding genes.  Default is
 ##' FALSE.
@@ -33,9 +33,8 @@
 ##' initial clusters.} \item{markers}{Seeds for attractors.}
 ##' \item{attrs.raw}{Raw results from \code{link{scanSeeds.adaptive}.}}
 ##' \item{attrs}{A list of attractors in which identical attractors were
-##' removed.} \item{finalAttrs}{A list of attractors in which duplicated and
+##' removed.} \item{finalAttrs}{A list of attractors in which duplicate and
 ##' identical attractors were removed.}
-##' @author Lingyi Cai
 ##' @seealso \code{\link{filterGenes}}
 ##' @references
 ##' @examples

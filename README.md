@@ -30,7 +30,7 @@ library(CASCC)
 data("Data_Tissues_li_2k")
 
 ## run CASCC
-res <- CASCC::run.CASCC(data_2k, groundTruth = NULL, attr.raw = NULL)
+res <- CASCC::run.CASCC(data, groundTruth = NULL, attr.raw = NULL)
 
 ## plot the results
 adata <- res$res.predictK$adata # feature-selected UMAP

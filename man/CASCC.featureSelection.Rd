@@ -51,7 +51,7 @@ Default is 50.}
 \item{removeMT.RP.ERCC}{If remove mitochondrial genes, ribosomal genes and
 spike-in genes from the analysis. Default is TRUE.}
 
-\item{topN.DEG.as.seed}{The Number of top DEGs to use as seeds. Default is
+\item{topN.DEG.as.seed}{The Number of top DEGs in each cluster to use as seeds. Default is
 1.}
 
 \item{removeNonProtein}{If remove non-protein coding genes.  Default is
@@ -66,7 +66,7 @@ after gene filtering.} \item{dfMarkers}{Differential expression genes for
 initial clusters.} \item{markers}{Seeds for attractors.}
 \item{attrs.raw}{Raw results from \code{link{scanSeeds.adaptive}.}}
 \item{attrs}{A list of attractors in which identical attractors were
-removed.} \item{finalAttrs}{A list of attractors in which duplicated and
+removed.} \item{finalAttrs}{A list of attractors in which duplicate and
 identical attractors were removed.}
 }
 \description{
@@ -74,7 +74,4 @@ This function help select features for clustering.
 }
 \seealso{
 \code{\link{filterGenes}}
-}
-\author{
-Lingyi Cai
 }

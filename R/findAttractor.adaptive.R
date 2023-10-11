@@ -99,7 +99,7 @@ findAttractor.adaptive <- function(data, seed, exponent.max = 5, exponent.min = 
 
 
 
-## Round 1, step.large
+## Round 1, step.initial
 cat("1st round start...       \r")
 flush.console()
   while(Failed == FALSE && skipRound1 == FALSE && a >= exponent.min ){

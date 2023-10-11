@@ -5,9 +5,9 @@
 ##'
 ##'
 ##' @param data Gene expression matrix
-##' @param topN By default, topN = 1. TopN ranked differentially expressed
+##' @param topN.DEG.as.seed By default, topN = 1. TopN ranked differentially expressed
 ##' genes (DEGs) of each of the clusters found in initial clusters will be used
-##' as the seed gene.
+##' as the seed genes.
 ##' @param resolution By default, resolution = 2. Resolution parameter in
 ##' \code{Seurat::FindClusters}
 ##' @param needNorm If the input data needs normalization. When \code{TRUE},

@@ -20,7 +20,7 @@ kmeansCenterModify <- function(res){
   # ## scenario 1
   # attrs <- collapseAttractorList(res$fs.res$attrs.raw, NumTopFeature=50, overlapN = 50, verbose = F) #remove identical attractors
   # # ./R/collapseAttractorList.R
-  # # remove similar attractors
+  # # remove duplicate attractors
   # ## scenario 2
   # attrs <- collapseAttractorList(res$fs.res$attrs.raw, NumTopFeature=50, overlapN = 10)
   # ## scenario 3

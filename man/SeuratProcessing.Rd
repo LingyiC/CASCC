@@ -16,6 +16,10 @@ SeuratProcessing(
 \arguments{
 \item{data}{Gene expression matrix}
 
+\item{topN.DEG.as.seed}{By default, topN = 1. TopN ranked differentially expressed
+genes (DEGs) of each of the clusters found in initial clusters will be used
+as the seed genes.}
+
 \item{resolution}{By default, resolution = 2. Resolution parameter in
 \code{Seurat::FindClusters}}
 
@@ -27,10 +31,6 @@ normalize.}
 
 \item{topDEGs}{The \code{topDEGs} top-ranked DEGs of each cluster will be
 used as features in the following analysis.}
-
-\item{topN}{By default, topN = 1. TopN ranked differentially expressed
-genes (DEGs) of each of the clusters found in initial clusters will be used
-as the seed gene.}
 }
 \description{
 To prepare the list of seed genes, we apply the low-complexity "Seurat"
