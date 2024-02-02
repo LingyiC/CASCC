@@ -10,10 +10,13 @@
 ##' @param index The index to be calculated. Default is "silhouette".
 ##' @param min.nc_fix Whether to fix the minimum number of clusters. Default is
 ##' FALSE.
+##' @param if_PCA_input Whether to use PCA to predict the number of clusters. Default is
+##' FALSE. Then use UMAP 2D embedding
+##' @param nPCA The number of PCA. Default is NULL
 ##' @return \item{clusterK}{The estimated number of clusters.}
 ##' \item{adata}{Seurat object after CASCC feature selection.}
 ##' @author Lingyi Cai
-##' 
+##'
 ##' @references
 ##' @examples
 ##'
@@ -21,11 +24,11 @@
 ##' @export
 
 
-predictClusterK <- function(data, fs.res, method = "ward.D2", index = "silhouette", min.nc_fix = TRUE){
+predictClusterK <- function(data, fs.res, method = "ward.D2", index = "silhouette", min.nc_fix = TRUE, if_PCA_input = FALSE, nPCA = NULL){
   res.predictK <- list()
   features <- fs.res$features
 
-  adata <- Seurat::CreateSeuratObject(counts = data, verbose = F)
+  adata <- Seurat::CreateSeuratObject(counts = data, verbose = F) # this step is the full
   adata@assays$RNA@var.features <- features
   adata <- Seurat::ScaleData(adata, verbose = F)
   adata <- Seurat::RunPCA(adata, verbose = F)
@@ -42,18 +45,30 @@ predictClusterK <- function(data, fs.res, method = "ward.D2", index = "silhouett
   attrs.veryStable <- finalAttrs[selected]
 
   # max.nc equals the number of attractors after removing the duplicated attratcors
-  if(min.nc_fix == TRUE){
-    res.nbclust <- NbClust::NbClust(adata@reductions$umap@cell.embeddings,
-                    min.nc = 3, max.nc = length(fs.res$finalAttrs), #fs.res$attrs
-                    method = method, index =index)
-  }else {
-    # default options 
-    res.nbclust <- NbClust::NbClust(adata@reductions$umap@cell.embeddings,
-                    min.nc = max(3, length(attrs.veryStable)), max.nc = length(fs.res$finalAttrs), #attr.res$attractorSignatureList
-                    method = method, index =index)
+  if(if_PCA_input == FALSE){
+    if(min.nc_fix == TRUE){
+      res.nbclust <- NbClust::NbClust(adata@reductions$umap@cell.embeddings,
+                                      min.nc = 3, max.nc = max(3, length(fs.res$finalAttrs)), #fs.res$attrs
+                                      method = method, index =index)
+    }else {
+      # default options
+      res.nbclust <- NbClust::NbClust(adata@reductions$umap@cell.embeddings,
+                                      min.nc = max(3, length(attrs.veryStable)), max.nc = max(3, length(fs.res$finalAttrs)), #attr.res$attractorSignatureList
+                                      method = method, index =index)
+    }
+
+  }else if(if_PCA_input == TRUE){
+    if(min.nc_fix == TRUE){
+      res.nbclust <- NbClust::NbClust(adata@reductions$pca@cell.embeddings[, 1:nPCA],
+                                      min.nc = 3, max.nc = max(3, length(fs.res$finalAttrs)), #fs.res$attrs
+                                      method = method, index =index)
+    }else {
+      # default options
+      res.nbclust <- NbClust::NbClust(adata@reductions$pca@cell.embeddings[, 1:nPCA],
+                                      min.nc = max(3, length(attrs.veryStable)), max.nc = max(3, length(fs.res$finalAttrs)), #attr.res$attractorSignatureList
+                                      method = method, index =index)
+    }
   }
-
-
 
   res.predictK$clusterK <- res.nbclust$Best.nc["Number_clusters"]
   res.predictK$umap.cell.embeddings <- adata@reductions$umap@cell.embeddings

@@ -97,7 +97,7 @@ CASCC.featureSelection <- function(data, inputDataType = "well-normalized", attr
 
   # Step 3: selected features
   # attrs <- collapseAttractorList(res) ## 50 50
-  attrs <- collapseAttractorList(res, NumTopFeature=50) # remove the identical attractors 
+  attrs <- collapseAttractorList(res, NumTopFeature=50) # remove the identical attractors
   features <- lapply(attrs, function(x){names(x[1:topAttr])})
   # features <- lapply(attrs, function(x){names(x[1: min(round(nrow(data)*0.005), 50)])})
   features <- unique(unlist(features))
@@ -116,10 +116,10 @@ CASCC.featureSelection <- function(data, inputDataType = "well-normalized", attr
 
   # ./R/collapseAttractorList.R
   # remove similar attractors
-  # remove the duplicated attractors 
-  attrs <- collapseAttractorList(res, NumTopFeature=50, overlapN = overlapN) # remove the duplicated attractors 
-  ## backup 
-  attrs <-  attractorModify(attrs, adata, expressionLevel = 1, percentage = attractorModify.percentage) # default attractorModify.percentage is 0, equals we skip this step
+  # remove the duplicated attractors
+  attrs <- collapseAttractorList(res, NumTopFeature=50, overlapN = overlapN) # remove the duplicated attractors
+  ## backup
+  attrs <-  attractorModify(attrs, adata, expressionLevel = 1, percentage = attractorModify.percentage, overlapN = overlapN) # default attractorModify.percentage is 0, equals we skip this step
 
   resList$finalAttrs <- attrs # removed duplciated attractors
 

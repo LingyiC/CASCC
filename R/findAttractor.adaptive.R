@@ -260,6 +260,27 @@ flush.console()
 ## ===
 ## Compared to the original version, the attractor algorithm stops when the attractor diverged.
 ## ===
+##' find Attractor
+##'
+##' @param data
+##' @param seed
+##' @param a
+##' @param seedTopN
+##' @param maxIter
+##' @param epsilon
+##' @param bin
+##' @param so
+##' @param rankBased
+##' @param negateMI
+##' @param verbose
+##' @return
+##' @seealso
+##' @references
+##' @examples
+##'
+##'
+##'
+##' @export
 findAttractor.2 <- function(data, seed, a = 5, seedTopN = 100, maxIter = 100, epsilon = 1e-7, bin = 6,
     so = 3, rankBased = FALSE, negateMI = TRUE, verbose = TRUE)
 {

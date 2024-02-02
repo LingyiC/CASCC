@@ -12,6 +12,3 @@ kmeansCenterModify(res)
 \description{
 Kmeans with centers
 }
-\author{
-Lingyi Cai
-}

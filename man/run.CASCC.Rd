@@ -19,6 +19,8 @@ run.CASCC(
   topDEGs = 10,
   topAttr = 50,
   min.nc_fix = FALSE,
+  if_PCA_input = TRUE,
+  nPCA = 30,
   overlapN = 10,
   attractorModify.percentage = 0
 )
@@ -39,6 +41,15 @@ list of attractors.}
 \item{mc.cores}{Default \code{NULL}. The number of cores to be used. By
 default, CASCC use only 1 core.}
 
+\item{removeMT.RP.ERCC}{Default \code{TRUE}. By default, MT, RP, and ERCC genes
+will be removed.}
+
+\item{removeNonProtein}{Default \code{FALSE}. By default, non-protein coding
+genes will not be removed.}
+
+\item{topN.DEG.as.seed}{Default \code{1}. By default, the top 1 DEG of each
+cluster will be used as seeds in the following analysis.}
+
 \item{exponent.max}{Default \code{10}.}
 
 \item{exponent.min}{Default \code{2}.}
@@ -52,6 +63,17 @@ attractor will be used as features in the following analysis.}
 \item{min.nc_fix}{Default \code{FALSE}. If \code{TRUE}, the minimum number
 of clusters will be fixed to be 3. If \code{FALSE}, the minimum number of
 clusters will be suggested by CASCC attractor output.}
+
+\item{if_PCA_input}{Default \code{TRUE}. If \code{TRUE}, the input will be
+PCA transformed. If \code{FALSE}, the input will be reduced to 2D UMAP
+space. If \code{"feature-matrix"}, the input will be the feature matrix.}
+
+\item{nPCA}{Default \code{30}. The number of PCA components to be used.}
+
+\item{overlapN}{Default \code{10}. The number of overlapping genes between
+different attractors.}
+
+\item{attractorModify.percentage}{Default \code{0}.}
 }
 \value{
 \item{fs.res}{Output of \code{\link{CASCC.featureSelection}}. Step

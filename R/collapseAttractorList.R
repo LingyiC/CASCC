@@ -2,11 +2,11 @@
 
 
 ##' Collapse AttractorList
-##' 
+##'
 ##' This function helps remove identical or duplicate attractors from a list of
 ##' attractors.
-##' 
-##' 
+##'
+##'
 ##' @param attractorList A list of attractors.
 ##' @param NumTopFeature Number of top features to be used in the attractors'
 ##' comparison.
@@ -18,9 +18,9 @@
 ##' @seealso
 ##' @references
 ##' @examples
-##' 
-##' 
-##' 
+##'
+##'
+##'
 ##' @export
 
 
@@ -77,6 +77,26 @@ collapseAttractorList <- function(attractorList, NumTopFeature=50, outputLength=
 }
 
 
+##' Modify Attractors
+##'
+##' Remove attractors do not express in at least x% cells, by default we skip 
+##' this step (percentage = 0%)
+##' @param attrs A list of attractors.
+##' @param adata A Seurat object.
+##' @param expressionLevel The expression level to be used to determine whether
+##' an attractor is expressed in a cell.
+##' @param percentage The percentage of cells that an attractor should express in.
+##' @param overlapN The number of top features that are allowed to overlap
+##' between two attractors.
+##' @return
+##' @seealso
+##' @references
+##' @examples
+##'
+##'
+##'
+##' @export
+
 attractorModify <- function(attrs, adata, expressionLevel = 0, percentage = 0.02, overlapN = 10){
 
   attr.last.num = 0
@@ -86,7 +106,7 @@ attractorModify <- function(attrs, adata, expressionLevel = 0, percentage = 0.02
     attr.last.num <- length(attrs)
   }
 
-  ## remove attractors do not express in at least 2% cells, by default we skip this step 
+  ## remove attractors do not express in at least 2% cells, by default we skip this step
   top1_genes <- unlist(lapply(attrs, function(x){names(x[1])}))
   tmp <- which(sapply(top1_genes, function(x){length(which(adata[["RNA"]]@data[x, ] > expressionLevel))}) < ncol(adata)*percentage)
   attrs[tmp] <- NULL
@@ -97,11 +117,24 @@ attractorModify <- function(attrs, adata, expressionLevel = 0, percentage = 0.02
 
 
 
-
+##' areVectorsSimilar
+##'
+##' @param vectorA
+##' @param vectorB
+##' @param verbose
+##' @param overlapN
+##' @return
+##' @seealso
+##' @references
+##' @examples
+##'
+##'
+##'
+##' @export
 
 
 #Collapse
-areVectorsSimilar <-function(vectorA, vectorB, verbose=FALSE, overlapN=5){
+areVectorsSimilar <-function(vectorA, vectorB, verbose=FALSE, overlapN=10){
 	isSimilar=FALSE
 
 	if(length(intersect(vectorA,vectorB))>=overlapN)

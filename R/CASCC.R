@@ -11,17 +11,30 @@
 ##' scanning results \code{CASCC.output$fs.res$attrs.raw}, they can provide the
 ##' list of attractors.
 ##' @param inputDataType Default \code{"well-normalized"}.
-##' @param min.nc_fix Default \code{FALSE}. If \code{TRUE}, the minimum number
-##' of clusters will be fixed to be 3. If \code{FALSE}, the minimum number of
-##' clusters will be suggested by CASCC attractor output.
-##' @param exponent.max Default \code{10}.
-##' @param exponent.min Default \code{2}.
 ##' @param mc.cores Default \code{NULL}. The number of cores to be used. By
 ##' default, CASCC use only 1 core.
+##' @param removeMT.RP.ERCC Default \code{TRUE}. By default, MT, RP, and ERCC genes
+##' will be removed.
+##' @param removeNonProtein Default \code{FALSE}. By default, non-protein coding
+##' genes will not be removed.
+##' @param topN.DEG.as.seed Default \code{1}. By default, the top 1 DEG of each
+##' cluster will be used as seeds in the following analysis.
+##' @param exponent.max Default \code{10}.
+##' @param exponent.min Default \code{2}.
 ##' @param topDEGs Default \code{10}. By default, the top 10 DEGs of each
 ##' cluster will be used as features in the following analysis.
 ##' @param topAttr Default \code{50}. By default, the top 50 genes of each
 ##' attractor will be used as features in the following analysis.
+##' @param min.nc_fix Default \code{FALSE}. If \code{TRUE}, the minimum number
+##' of clusters will be fixed to be 3. If \code{FALSE}, the minimum number of
+##' clusters will be suggested by CASCC attractor output.
+##' @param if_PCA_input Default \code{TRUE}. If \code{TRUE}, the input will be
+##' PCA transformed. If \code{FALSE}, the input will be reduced to 2D UMAP
+##' space. If \code{"feature-matrix"}, the input will be the feature matrix.
+##' @param nPCA Default \code{30}. The number of PCA components to be used.
+##' @param overlapN Default \code{10}. The number of overlapping genes between
+##' different attractors.
+##' @param attractorModify.percentage Default \code{0}. 
 ##' @return \item{fs.res}{Output of \code{\link{CASCC.featureSelection}}. Step
 ##' 1 to step 3 of CASCC.} \item{res.predictK}{Output of
 ##' \code{\link{predictClusterK}}. Step 4 of CASCC.} \item{res.kmeans}{Output
@@ -39,7 +52,7 @@
 run.CASCC <- function(data.lognormcount, groundTruth.K = NULL, attr.raw = NULL, inputDataType = "well-normalized", mc.cores = 2,
                       removeMT.RP.ERCC = TRUE, removeNonProtein = FALSE,
                       topN.DEG.as.seed = 1, generalSeedList = NULL, exponent.max = 10, exponent.min = 2, topDEGs = 10, topAttr = 50,
-                      min.nc_fix = FALSE,
+                      min.nc_fix = FALSE, if_PCA_input = TRUE, nPCA = 30,
                       overlapN = 10, attractorModify.percentage = 0){
     set.seed(1)
     res <- list()
@@ -52,7 +65,7 @@ run.CASCC <- function(data.lognormcount, groundTruth.K = NULL, attr.raw = NULL, 
     adata  <- fs.res$adata; data.lognormcount <- adata[["RNA"]]@data; data.lognormcount <- as.matrix(data.lognormcount)
 
     # Step 4
-    res.predictK <- predictClusterK(data.lognormcount, fs.res, method = "ward.D2", index = "silhouette", min.nc_fix = min.nc_fix)
+    res.predictK <- predictClusterK(data.lognormcount, fs.res, method = "ward.D2", index = "silhouette", min.nc_fix = min.nc_fix, if_PCA_input = if_PCA_input, nPCA = nPCA)
 
     # Step 5 - random centers
     if(is.null(groundTruth.K) == TRUE){
@@ -66,7 +79,5 @@ run.CASCC <- function(data.lognormcount, groundTruth.K = NULL, attr.raw = NULL, 
 
     # Step 5 - fixed centers, mainType.output clustering results: res$maintype.output$clusteringResults
     res$mainType.output <- kmeansCenterModify(res)
-
-
     return(res)
 }

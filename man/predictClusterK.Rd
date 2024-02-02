@@ -9,7 +9,9 @@ predictClusterK(
   fs.res,
   method = "ward.D2",
   index = "silhouette",
-  min.nc_fix = TRUE
+  min.nc_fix = TRUE,
+  if_PCA_input = FALSE,
+  nPCA = NULL
 )
 }
 \arguments{
@@ -25,6 +27,11 @@ are cells.}
 
 \item{min.nc_fix}{Whether to fix the minimum number of clusters. Default is
 FALSE.}
+
+\item{if_PCA_input}{Whether to use PCA to predict the number of clusters. Default is
+FALSE. Then use UMAP 2D embedding}
+
+\item{nPCA}{The number of PCA. Default is NULL}
 }
 \value{
 \item{clusterK}{The estimated number of clusters.}

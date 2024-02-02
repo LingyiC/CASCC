@@ -139,6 +139,25 @@ scanSeeds.adaptive <- function(data, markers, epsilon = 1e-4, verbose = FALSE, e
 
 
 
+##' Scan seeds in adaptive manner with multiple cores
+##' 
+##' 
+##' 
+##' @param data A matrix of gene expression data. Rows are genes and columns
+##' are cells.
+##' @param seed Seed gene.
+##' @param epsilon Threshold of convergence. By default, epsilon = 1e-4.
+##' @param verbose When TRUE, it will show the top 20 genes of the metagene in
+##' each iteration.
+##' @param exponent.max max exponent value.
+##' @param exponent.min min exponent value.
+##' @return
+##' @seealso \code{\link{findAttractor.adaptive}}
+##' @references
+##' @examples
+##' 
+##' 
+##' @export
 
 findAttractor.adaptive_forMultiCores <- function(data, seed, epsilon = 1e-4, verbose = FALSE, exponent.max = 5, exponent.min = 2){
       tmp <- NULL

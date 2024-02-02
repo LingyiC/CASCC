@@ -1,15 +1,14 @@
 ##' Kmeans with centers
-##' 
-##' 
-##' 
+##'
+##'
+##'
 ##' @param res The CASCC project
 ##' @return
-##' @author Lingyi Cai
-##' 
+##'
 ##' @references
 ##' @examples
-##' 
-##' 
+##'
+##'
 ##' @export
 
 kmeansCenterModify <- function(res){
@@ -41,6 +40,19 @@ kmeansCenterModify <- function(res){
   return(output)
 }
 
+##' Kmeans with centers Using attractors as centers
+##'
+##'
+##' @param data.full The full data matrix
+##' @param features The features
+##' @param attrs The attractors
+##' @return
+##'
+##' @references
+##' @examples
+##'
+##'
+##' @export
 
 ### Using attractors as centers
 run.kmeans.fixCenters <- function(data.full, features, attrs){
@@ -69,7 +81,18 @@ run.kmeans.fixCenters <- function(data.full, features, attrs){
 
 ##=== Kmeans
 # > initial.centers <- names(unlist(lapply(attrs, function(x){which.max(apply(data[names(x[1:50]), ], 2, mean))})))
-
+##' Run kmeans
+##'
+##'
+##' @param data.lognormcount The log normalized count matrix
+##' @param centers The number of centers
+##' @return
+##'
+##' @references
+##' @examples
+##'
+##'
+##' @export
 run.kmeans <- function(data.lognormcount, centers){
   set.seed(1)
   res <- list()
