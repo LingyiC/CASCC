@@ -27,22 +27,31 @@ install_github("weiyi-bitw/cafr")  # The 'cafr' R package is required for runnin
 ```R
 library(CASCC)
 ## load the toy data
-data("Data_Tissues_li_2k")
+data("Data_Tissues_li_2k") 
 
 ## run CASCC
-res <- CASCC::run.CASCC(data, groundTruth = NULL, attr.raw = NULL)
+res <- CASCC::run.CASCC(data) # inputDataType `data` is normalized and log-transformed. 
+# groundTruth = NULL, attr.raw = NULL, inputDataType = "well-normalized"
+# If users already have attractor scanning results, they can input `attr.raw` to save time.
 
 ## plot the results
 adata <- res$res.predictK$adata # feature-selected UMAP
 labels <- res$mainType.output$clusteringResults # clustering output: k-means with attractor centers
 Idents(adata) <- labels
 DimPlot(adata)
+
+## results list
+attr.raw <- res$fs.res$attr.raw # raw attractor scanning results, can be used if rerun CASCC
+attrs <- res$fs.res$attrs # attractors removed identical ones
+finalAttrs <- res$fs.res$finalAttrs # filtered attractors 
+
 ```
 ## Run-CASCC-step-by-step
 ```R
 library("CASCC")
 # Step 0 - Step 3
-fs.res <- CASCC.featureSelection(data, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2, generalSeedList = NULL, mc.cores = 1, topDEGs = 10, topAttr = 50,
+fs.res <- CASCC.featureSelection(data, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2, 
+                                 generalSeedList = NULL, mc.cores = 1, topDEGs = 10, topAttr = 50,
                                  removeMT.RP.ERCC = TRUE, removeNonProtein = FALSE,
                                  topN.DEG.as.seed = 1,
                                  overlapN = 10)
@@ -68,7 +77,7 @@ res$mainType.output <- tmp
 ## Toy-data
 Generate the toy data
 ```R
-load("./Data_Tissues_li_full.RData")
+load("./Data_Tissues_li_full.RData") # download from https://hemberg-lab.github.io/scRNA.seq.datasets/,  data <- rds@assays[["data"]]@listData[["logcounts"]]
 library("Seurat")
 adata <- CreateSeuratObject(counts = data, verbose = F)
 # adata <- NormalizeData(adata)
@@ -96,7 +105,7 @@ save(res, file = "./CASCC/data/Res_Tissues_li_2k.RData")
 ```
 
 # Session-info
-Session info to replicate the clustering of Table S1 datasets
+Session info to replicate the clustering results of Table S1 datasets
 ```
 R version 4.0.5 (2021-03-31)
 Platform: x86_64-pc-linux-gnu (64-bit)
