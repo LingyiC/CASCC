@@ -1,7 +1,7 @@
 Package: CASCC
 Type: Package
 Title: CASCC: A co-expression assisted single-cell RNA-seq data clustering method
-Version: 0.1.0
+Version: 0.1.2
 Author: c(person("Lingyi", "Cai", role = c("aut", "cre")), 
     person("Dimitris", "Anastassiou", role = "aut"))
 Maintainer: Lingyi Cai <lingyi.cai@columbia.edu>
@@ -9,7 +9,7 @@ Description: Here, we introduce a clustering method, CASCC, designed to improve 
 Depends: R (>= 3.5.0)
 Imports: 
     cafr, 
-    Seurat, 
+    Seurat (== 4.3.0), 
     SeuratObject,
     NbClust,
     ggplot2,
@@ -18,8 +18,14 @@ Imports:
     dplyr,
     RColorBrewer,
     gridExtra,
-    tidyverse
+    tidyverse,
+    parallel
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
+Suggests: 
+    knitr,
+    rmarkdown,
+    Seurat (== 4.3.0)
+VignetteBuilder: knitr

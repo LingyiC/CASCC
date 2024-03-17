@@ -1,7 +1,7 @@
 ##' Scan seeds in adaptive manner
-##' 
-##' 
-##' 
+##'
+##'
+##'
 ##' @param data A matrix of gene expression data. Rows are genes and columns
 ##' are cells.
 ##' @param markers A list of genes that are used as seeds.
@@ -14,19 +14,26 @@
 ##' @param compareNth Maximize the strength of the compareNth-ranked genes in
 ##' the converged attractor.
 ##' @param mc.cores Number of cores to be used. Default is 1.
-##' @return
+##' @return \item{attractorSignatureList}{Attractors.} \item{attractorTouchedGenes}{Skipped 
+##' seeds.} \item{runSeed}{Scanned seeds.} 
+##' \item{history_exponent}{History
+##' exponent.} \item{final.exponent}{Final exponent.}
 ##' @author Lingyi Cai
 ##' @seealso \code{\link{findAttractor.adaptive}}
 ##' @references
 ##' @examples
-##' 
-##' 
+##' library("CASCC")
+##' library("cafr")
+##' data("Data_PDAC_peng_2k") 
+##' # Find LUM-seeded and RGS5-seeded attractor. LUM gene is a marker of fibroblast cells. RGS5 gene is a marker of pericyte cells.
+##' attr <- scanSeeds.adaptive(Data_PDAC_peng_2k, c("LUM", "RGS5"))
+
 ##' @export
- 
+
 scanSeeds.adaptive <- function(data, markers, epsilon = 1e-4, verbose = FALSE, exponent.max = 10, exponent.min = 2, seedTopN = min(round(nrow(data)*0.005), 50), compareNth = 10, mc.cores = NULL){
 
   if(is.null(mc.cores) == TRUE){
-    library("cafr")
+    suppressMessages(library(cafr))
     data <- as.matrix(data)
     seedList <- markers
     attractorObjects <- list()
@@ -67,7 +74,7 @@ scanSeeds.adaptive <- function(data, markers, epsilon = 1e-4, verbose = FALSE, e
     }
     res <- list(attractorSignatureList=attractorSignatureList, attractorTouchedGenes = attractorTouchedGenes, runSeed = runSeed, history_exponent=history_exponent, final.exponent=final.exponent)
   }else{
-    library("cafr")
+    suppressMessages(library(cafr))
     data <- as.matrix(data)
     seedList <- markers
     attractorObjects <- list()
@@ -140,9 +147,9 @@ scanSeeds.adaptive <- function(data, markers, epsilon = 1e-4, verbose = FALSE, e
 
 
 ##' Scan seeds in adaptive manner with multiple cores
-##' 
-##' 
-##' 
+##'
+##'
+##'
 ##' @param data A matrix of gene expression data. Rows are genes and columns
 ##' are cells.
 ##' @param seed Seed gene.
@@ -155,8 +162,8 @@ scanSeeds.adaptive <- function(data, markers, epsilon = 1e-4, verbose = FALSE, e
 ##' @seealso \code{\link{findAttractor.adaptive}}
 ##' @references
 ##' @examples
-##' 
-##' 
+##'
+##'
 ##' @export
 
 findAttractor.adaptive_forMultiCores <- function(data, seed, epsilon = 1e-4, verbose = FALSE, exponent.max = 5, exponent.min = 2){

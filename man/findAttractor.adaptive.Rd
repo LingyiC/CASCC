@@ -55,12 +55,25 @@ each iteration.}
 \item{second.idx}{Default second.idx = 2, the second gene of the metagene
 in each iteration.}
 }
+\value{
+\item{attractor.final}{Attractor.} \item{scannedSeeds}{Skipped 
+seeds.} \item{history_matrix}{History matrix including attractor output using different exponents.} 
+\item{history_exponent}{History
+exponent.} \item{final.exponent}{Final exponent.}
+}
 \description{
 Find adaptive attractors using adaptive attractor finding algorithm. The
 algorithm will scan the exponent from exponent.max to exponent.min with
-step.large, and then scan the exponent from exponent.min to exponent.max
-with scanning steps. The algorithm will maximize the strength of the
+step.large, and then scan the exponent from exponent.max to exponent.min
+with step.small. The algorithm will maximize the strength of the
 attractor.
+}
+\examples{
+library("CASCC")
+library("cafr")
+data("Data_PDAC_peng_2k") 
+# Find LUM-seeded attractor. LUM gene is a marker of fibroblast cells.
+attr <- findAttractor.adaptive(Data_PDAC_peng_2k, "LUM")
 }
 \seealso{
 \code{\link{scanSeeds.adaptive}}

@@ -1,0 +1,370 @@
+---
+title: "CASCC: A co-expression assisted single-cell RNA-seq data clustering method" 
+author:
+  - <font size="4"> Lingyi Cai</font>^[Department of Systems Biology; Department of Electrical Engineering, Columbia University, New York, NY, USA], <font size="4"> Dimitris Anastassiou</font>^[Department of Systems Biology; Department of Electrical Engineering; Herbert Irving Comprehensive Cancer Center, Columbia University, New York, NY, USA] <br>
+date: <font size="3"> `r format(Sys.Date(), '%m/%d/%Y')` </font>
+bibliography: bibFile.bib
+output:
+    html_document:
+      highlight: tango
+      theme: united
+      toc: true
+      number_sections: true
+      toc_float: 
+        collapsed: true
+        smooth_scroll: true
+      fig_width: 5
+      df_print: paged
+      code_folding: show
+      
+vignette: >
+  %\VignetteIndexEntry{Introduction to CASCC}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=FALSE, results="hide"}
+knitr::opts_chunk$set(tidy = FALSE,
+                      cache = FALSE,
+                      dev = "png",
+                      message = FALSE, error = FALSE, warning = TRUE)
+```	
+
+# Install CASCC 
+## install R and R package using anaconda (recommended)
+```{r, eval = FALSE}
+conda create -n CASCC_env
+source activate CASCC_env
+conda install conda-forge::r-devtools
+
+R
+.libPaths("./anaconda3/envs/CASCC_env/lib/R/library") # set conda R library path
+install.packages("rlang",version="1.1.0") # dependency:update rlang package 
+remotes::install_version("Seurat", "4.3.0") # dependency
+devtools::install_github("weiyi-bitw/cafr") # dependency
+devtools::install_github("LingyiC/CASCC")
+```
+
+## install in R
+```{r, eval = FALSE}
+require(devtools)
+install_github("LingyiC/CASCC")
+checkDependencies() # We highly recommend users to use Seurat V4 instead of V5 as dependency of CASCC. 
+```
+
+# CASCC tutorial
+
+## Quick Start - clustering 
+### Run CASCC in one line of code
+```{r, eval=FALSE}
+rm(list = ls()); gc()
+library(CASCC)
+library(Seurat)
+set.seed(1)
+## load the toy dataset
+data("Data_PDAC_peng_2k") 
+dim(Data_PDAC_peng_2k) # 400 cells 
+
+## run CASCC
+res <- CASCC::run.CASCC(Data_PDAC_peng_2k) # inputDataType `data` is normalized and log-transformed. 
+
+## clustering results 
+labels <- res$mainType.output$clusteringResults
+```
+
+```{r, eval=TRUE}
+rm(list = ls()); gc()
+library(CASCC)
+library(Seurat)
+load("/home/lingyi/Documents/reproduce/CASCC/data/Res_PDAC_peng_2k.RData")
+res <- Res_PDAC_peng_2k
+```
+
+### UMAP visualization
+```{r, fig.width=5, fig.height=4}
+## plot the results
+adata <- res$res.predictK$adata # feature-selected UMAP
+labels <- res$mainType.output$clusteringResults # clustering output: k-means with attractor centers
+Idents(adata) <- labels
+DimPlot(adata)
+```
+
+### Attractor co-expression output
+```{r}
+## results list
+attr.raw <- res$fs.res$attr.raw # raw attractor scanning results, can be used if rerun CASCC
+attrs <- res$fs.res$attrs # attractors removed identical ones
+finalAttrs <- res$fs.res$finalAttrs # filtered attractors 
+
+
+## attractors used as the clustering centers
+attrs <- res$mainType.output$attrs.center
+df <- as.data.frame(do.call(cbind, lapply(attrs, function(x) {data.frame("gene" = names(x))})))
+titles <- c()
+for (attr.ID in paste0("attr_", unlist(lapply(attrs, function(x){names(head(x)[1])})))) {
+  titles <- c(titles, c(attr.ID))
+}
+
+colnames(df) <- titles
+
+df[1:10, ] # from left to right, they represent macrophage cell, Ductal cell type 1, B cell, Endotehlial, Ductal cell type 2, T cell, Stellate cell and Fibroblast cell.
+```
+
+### UMAP, labeled by the attractors
+```{r, fig.width=6, fig.height=4}
+Idents(adata) <- res$mainType.output$clusteringResults
+nClust <- length(unique(Idents(adata)))
+mycolor <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(n = 8, name = "Dark2"))(nClust)
+attractorDimplot(adata, attr.list = res$mainType.output$attrs.center, col = mycolor) # col can set as NULL
+```
+
+### Attractor plot  
+Color the cells by the expression of the top 5 genes of each attractor. 
+```{r, fig.width=8, fig.height=6}
+attractorPlot(adata, attrs[1:4], n.col = 2)
+```
+
+### Understand CASCC output
+CASCC output object:
+
+- List of 4
+  - fs.res: List of 7
+    - features: selected features by CASCC
+    - adata: seurat object with initial clustering results
+    - dfMarkers: differential expression markers of initial clusters 
+    - markers: seed genes for attractor scanning
+    - attrs.raw: attractor scanning raw results 
+    - attrs: attractor scanning results after removing identical ones
+    - finalAttrs: attractor scanning results after removing duplicated ones
+  - res.predictK: List of 3
+    - clusterK: estimated number of clusters
+    - umap.cell.embeddings:  UMAP cell embeddings
+    - adata: final seurat object 
+  - res.kmeans: List of 2
+    - obj: kmeans clustering object
+    - clusteringResults: clustering results without attractor centers
+  - mainType.output: List of 2
+    - clusteringResults: clustering results with attractor centers
+    - attrs.center: attractor centers
+    
+Here is an example of CASCC output object:
+```{r}
+rm(list = ls()); gc()
+data("Res_PDAC_peng_2k") 
+str(Res_PDAC_peng_2k, max.level = 2)
+```
+
+## Quick Start - find co-expression signatures 
+
+We provide an adaptive version of attractor algorithm to find a converged attractor based on the seed gene provided. 
+If users are interested in the co-expression attractor only, they can use the following code to find the co-expression without running the whole CASCC pipeline. 
+
+```{r, eval = FALSE}
+library("CASCC")
+library("cafr")
+data("Data_PDAC_peng_2k") 
+# Find LUM-seeded attractor. LUM gene is a marker of fibroblast cells.
+attr.res <- findAttractor.adaptive(Data_PDAC_peng_2k, "LUM")
+
+# co-expression attractor 
+head(attr.res$attractor.final)	
+```
+
+
+## Run CASCC step by step
+```{r, eval = FALSE}
+rm(list = ls()); gc()
+library("CASCC")
+data("Data_PDAC_peng_2k") 
+# Step 0 - Step 3
+fs.res <- CASCC.featureSelection(Data_PDAC_peng_2k, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2, 
+                                 generalSeedList = NULL, mc.cores = 1, topDEGs = 10, topAttr = 50,
+                                 removeMT.RP.ERCC = TRUE, removeNonProtein = FALSE,
+                                 topN.DEG.as.seed = 1,
+                                 overlapN = 10)
+adata  <- fs.res$adata; 
+SeuratVersionCheck = as.numeric(strsplit(as.character(packageVersion("Seurat")), "\\.")[[1]][1])
+if (SeuratVersionCheck == 4) {
+  data <- adata[["RNA"]]@data
+}else if (SeuratVersionCheck == 5) {
+  data <- adata[["RNA"]]$data
+}
+data <- as.matrix(data)
+
+# Step 4
+res.predictK <- predictClusterK(data, fs.res, method = "ward.D2", index = "silhouette", min.nc_fix = FALSE)
+
+# results list
+res <- list()
+res$fs.res <- fs.res
+res$res.predictK <- res.predictK
+
+# Step 5 
+res$mainType.output <- kmeansCenterModify(res)
+
+    
+```
+
+
+# Other scripts
+
+## Generate the toy data
+Generate the toy data for the quick start. 
+
+```{r, eval = FALSE}
+set.seed(1)
+rm(list = ls()); gc()
+
+## Raw data from PRJCA001063
+load("./adata.T15.RData")
+load("./cell.type.RData")
+cell.type <- cell.type[which(cell.type$cell.name %in% colnames(adata)), ]
+
+table(cell.type$cluster)
+
+library(dplyr)
+
+sampled_cells <- cell.type %>%
+  group_by(cluster) %>%
+  ## if a cell type does not have more than 50 cells, we removed this cell type
+  sample_n(size = if_else(n() >= 50, 50, 0)) %>%
+  ungroup()
+print(sampled_cells)
+
+genes <- Seurat::VariableFeatures(adata)
+cells <- sampled_cells$cell.name
+SeuratVersionCheck = as.numeric(strsplit(as.character(packageVersion("Seurat")), "\\.")[[1]][1])
+if (SeuratVersionCheck == 4) {
+  data <- as.matrix(adata[["RNA"]]@data[genes, cells])
+}else if (SeuratVersionCheck == 5) {
+  data <- as.matrix(adata[["RNA"]]$data[genes, cells])
+}
+save(data, file = "./CASCC/data/Data_PDAC_peng_2k.RData")
+
+
+## ~ 1 min
+start_time <- Sys.time()
+res <- CASCC::run.CASCC(data)
+end_time <- Sys.time()
+end_time - start_time
+
+save(res, file = "./CASCC/data/Res_PDAC_peng_2k.RData")
+
+```
+## Run CASCC within Seurat workflow
+```{r, eval = FALSE}
+## after processed Seurat workflow
+# Seurat V4 is highly recommended!
+## Users' SeuratObject 
+SeuratVersionCheck = as.numeric(strsplit(as.character(packageVersion("Seurat")), "\\.")[[1]][1])
+if (SeuratVersionCheck == 4) {
+  data <- SeuratObject[["RNA"]]@data
+}else if (SeuratVersionCheck == 5) {
+  data <- SeuratObject[["RNA"]]$data
+}
+res <- CASCC::run.CASCC(data)
+Idents(SeuratObject) <- res$mainType.output$clusteringResults 
+SeuratObject
+
+
+```
+
+
+# Frequently asked questions
+We welcome any questions and feedback. We will provide a list of frequently asked questions and the answers.
+
+# Session info
+Session info to replicate the clustering results of Table S1 datasets. 
+
+```{r, eval = FALSE}
+sessionInfo()
+# R version 4.0.5 (2021-03-31)
+# Platform: x86_64-pc-linux-gnu (64-bit)
+# Running under: Ubuntu 18.04.5 LTS
+# 
+# Matrix products: default
+# BLAS:   /usr/lib/x86_64-linux-gnu/openblas/libblas.so.3
+# LAPACK: /usr/lib/x86_64-linux-gnu/libopenblasp-r0.2.20.so
+# 
+# locale:
+#  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+# [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+# 
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods   base     
+# 
+# other attached packages:
+# [1] cafr_0.312    dplyr_1.1.2   aricode_1.0.2 stringr_1.5.0
+# 
+# loaded via a namespace (and not attached):
+#   [1] Seurat_4.3.0                Rtsne_0.16                 
+#   [3] colorspace_2.1-0            deldir_1.0-6               
+#   [5] ellipsis_0.3.2              ggridges_0.5.4             
+#   [7] XVector_0.30.0              GenomicRanges_1.42.0       
+#   [9] spatstat.data_3.0-0         leiden_0.4.3               
+#  [11] listenv_0.9.0               ggrepel_0.9.3              
+#  [13] fansi_1.0.4                 codetools_0.2-19           
+#  [15] splines_4.0.5               polyclip_1.10-4            
+#  [17] jsonlite_1.8.4              ica_1.0-3                  
+#  [19] cluster_2.1.4               png_0.1-8                  
+#  [21] uwot_0.1.14                 shiny_1.7.4                
+#  [23] sctransform_0.3.5           spatstat.sparse_3.0-0      
+#  [25] compiler_4.0.5              httr_1.4.5                 
+#  [27] SeuratObject_4.1.3          Matrix_1.5-3               
+#  [29] fastmap_1.1.1               lazyeval_0.2.2             
+#  [31] limma_3.46.0                cli_3.6.1                  
+#  [33] later_1.3.0                 htmltools_0.5.5            
+#  [35] tools_4.0.5                 igraph_1.4.2               
+#  [37] gtable_0.3.3                glue_1.6.2                 
+#  [39] GenomeInfoDbData_1.2.4      RANN_2.6.1                 
+#  [41] reshape2_1.4.4              Rcpp_1.0.10                
+#  [43] scattermore_0.8             Biobase_2.50.0             
+#  [45] vctrs_0.6.2                 nlme_3.1-162               
+#  [47] spatstat.explore_3.0-6      progressr_0.13.0           
+#  [49] lmtest_0.9-40               spatstat.random_3.1-3      
+#  [51] globals_0.16.2              mime_0.12                  
+#  [53] miniUI_0.1.1.1              lifecycle_1.0.3            
+#  [55] irlba_2.3.5.1               goftest_1.2-3              
+#  [57] future_1.32.0               zlibbioc_1.36.0            
+#  [59] MASS_7.3-58.3               zoo_1.8-12                 
+#  [61] scales_1.2.1                promises_1.2.0.1           
+#  [63] MatrixGenerics_1.2.1        spatstat.utils_3.0-1       
+#  [65] NbClust_3.0.1               parallel_4.0.5             
+#  [67] SummarizedExperiment_1.20.0 RColorBrewer_1.1-3         
+#  [69] reticulate_1.28             pbapply_1.7-0              
+#  [71] gridExtra_2.3               ggplot2_3.4.2              
+#  [73] stringi_1.7.12              S4Vectors_0.28.1           
+#  [75] BiocGenerics_0.36.1         GenomeInfoDb_1.26.7        
+#  [77] rlang_1.1.0                 pkgconfig_2.0.3            
+#  [79] matrixStats_0.63.0          bitops_1.0-7               
+#  [81] lattice_0.20-45             tensor_1.5                 
+#  [83] ROCR_1.0-11                 purrr_1.0.1                
+#  [85] patchwork_1.1.2             htmlwidgets_1.6.2          
+#  [87] cowplot_1.1.1               tidyselect_1.2.0           
+#  [89] parallelly_1.35.0           RcppAnnoy_0.0.20           
+#  [91] plyr_1.8.8                  magrittr_2.0.3             
+#  [93] R6_2.5.1                    IRanges_2.24.1             
+#  [95] generics_0.1.3              DelayedArray_0.16.3        
+#  [97] pillar_1.9.0                fitdistrplus_1.1-11        
+#  [99] abind_1.4-5                 survival_3.5-3             
+# [101] RCurl_1.98-1.10             sp_1.6-0                   
+# [103] tibble_3.2.1                future.apply_1.10.0        
+# [105] CASCC_0.1.0                 KernSmooth_2.23-20         
+# [107] utf8_1.2.3                  spatstat.geom_3.0-6        
+# [109] plotly_4.10.1               grid_4.0.5                 
+# [111] data.table_1.14.8           digest_0.6.31              
+# [113] xtable_1.8-4                tidyr_1.3.0                
+# [115] httpuv_1.6.9                stats4_4.0.5               
+# [117] munsell_0.5.0               viridisLite_0.4.1          
+```

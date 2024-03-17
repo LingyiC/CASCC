@@ -25,7 +25,7 @@
 
 
 
-collapseAttractorList <- function(attractorList, NumTopFeature=50, outputLength=NULL, verbose=TRUE, overlapN = 50, removeDominant = FALSE){
+collapseAttractorList <- function(attractorList, NumTopFeature=50, outputLength=NULL, verbose=FALSE, overlapN = 50, removeDominant = FALSE){
 ## LC - remove the similar attractors
 	attractorCount <-0
 	allSignatureList<-list()
@@ -79,8 +79,8 @@ collapseAttractorList <- function(attractorList, NumTopFeature=50, outputLength=
 
 ##' Modify Attractors
 ##'
-##' Remove attractors do not express in at least x% cells, by default we skip 
-##' this step (percentage = 0%)
+##' Remove attractors do not express in at least x\% cells, by default we skip
+##' this step (percentage = 0\%)
 ##' @param attrs A list of attractors.
 ##' @param adata A Seurat object.
 ##' @param expressionLevel The expression level to be used to determine whether
@@ -108,7 +108,12 @@ attractorModify <- function(attrs, adata, expressionLevel = 0, percentage = 0.02
 
   ## remove attractors do not express in at least 2% cells, by default we skip this step
   top1_genes <- unlist(lapply(attrs, function(x){names(x[1])}))
-  tmp <- which(sapply(top1_genes, function(x){length(which(adata[["RNA"]]@data[x, ] > expressionLevel))}) < ncol(adata)*percentage)
+	SeuratVersionCheck = as.numeric(strsplit(as.character(packageVersion("Seurat")), "\\.")[[1]][1])
+	if (SeuratVersionCheck == 4) {
+		tmp <- which(sapply(top1_genes, function(x){length(which(adata[["RNA"]]@data[x, ] > expressionLevel))}) < ncol(adata)*percentage)
+	}else if (SeuratVersionCheck == 5) {
+		tmp <- which(sapply(top1_genes, function(x){length(which(adata[["RNA"]]$data[x, ] > expressionLevel))}) < ncol(adata)*percentage)
+	}
   attrs[tmp] <- NULL
   # tmp <- which(lapply(attrs, function(x){x[1]}) > 0.99)
   attrs[tmp] <- NULL

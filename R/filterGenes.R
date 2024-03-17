@@ -18,8 +18,9 @@
 ##' @seealso \code{\link{CASCC.featureSelection}}
 ##' @references
 ##' @examples
-##'
-##'
+##' library("CASCC")
+##' data("Data_PDAC_peng_2k") 
+##' data <- filterGenes(Data_PDAC_peng_2k)
 ##' @export
 filterGenes <- function(data, min.cells = 0.05*ncol(data), removeNonProtein = FALSE, removeMT.RP.ERCC = FALSE){
   # min.cells = 0.05*ncol(data)

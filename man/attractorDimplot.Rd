@@ -8,16 +8,33 @@ attractorDimplot(seuratObj, attr.list, label = F, cols = NULL)
 }
 \arguments{
 \item{seuratObj}{A Seurat object. For example,
-\code{CASCC.output$res.predictK$adata}.}
+\code{CASCC.output$res.predictK$adata}; \code{Idents(adata) <- CASCC.output$mainType.output$clusteringResults}.}
 
 \item{attr.list}{A list of attractors to plot. For example,
 \code{CASCC.output$mainType.output$attrs.center}.}
 
 \item{label}{Whether to label attractor on the plot.}
+
+\item{cols}{A vector of colors to use for each attractor. If not provided, use the default color.}
 }
 \description{
 This function plot the CASCC UMAP reuslts. Each dot will be labeled with
 the attractor it belongs to.
+}
+\examples{
+library(CASCC)
+library(Seurat)
+
+# load the toy dataset
+data("Res_PDAC_peng_2k")
+res <- Res_PDAC_peng_2k
+
+# assign clustering results to adata
+adata <- res$res.predictK$adata # feature-selected UMAP
+Idents(adata) <- res$mainType.output$clusteringResults # this step is necessary 
+
+# plot the attractor dimplot
+attractorDimplot(adata, res$mainType.output$attrs.center)
 }
 \seealso{
 \code{\link{attractorPlot}}

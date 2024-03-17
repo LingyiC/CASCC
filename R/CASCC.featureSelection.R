@@ -13,11 +13,14 @@
 ##' obtained attractor scanning results \code{CASCC.output$fs.res$attrs.raw},
 ##' they can provide the list of attractors to skip the scanning step.
 ##' @param exponent.max Maximum exponent for adaptive attractor. Default is 10.
+##' To facilitate the analysis of large dataset, 
+##' users can set a smaller value, such as 5.
 ##' @param exponent.min Minimum exponent for adaptive attractor. Default is 2.
-##' @param generalSeedList Seed genes set by users. Default is NULL.
+##' @param generalSeedList Seed genes set by users. Default is NULL. For example, 
+##' \code{generalSeedList = c("AMBP", "KRT19", "PRSS1", "CHGB", "RGS5", "LUM", "CDH5", "AIF1", "CD3D", "MS4A1")}.
 ##' @param mc.cores Number of cores to use.
 ##' @param topDEGs Number of top DEGs in each cluster selected as features.
-##' Default is 10.
+##' Default is 10. 
 ##' @param topAttr Number of top genes in each attractor selected as features.
 ##' Default is 50.
 ##' @param removeMT.RP.ERCC If remove mitochondrial genes, ribosomal genes and
@@ -38,7 +41,15 @@
 ##' @seealso \code{\link{filterGenes}}
 ##' @references
 ##' @examples
-##'
+##' library("CASCC")
+##' data("Data_PDAC_peng_2k") 
+##' 
+##' # Step 0 - Step 3
+##' fs.res <- CASCC.featureSelection(Data_PDAC_peng_2k, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2, 
+##'                                  generalSeedList = NULL, mc.cores = 1, topDEGs = 10, topAttr = 50,
+##'                                  removeMT.RP.ERCC = TRUE, removeNonProtein = FALSE,
+##'                                  topN.DEG.as.seed = 1,
+##'                                  overlapN = 10)
 ##'
 ##' @export
 
@@ -61,11 +72,18 @@ CASCC.featureSelection <- function(data, inputDataType = "well-normalized", attr
   }
 
   # Step 1: initial clustering
+  cat("Step 1: preparing the seed list...", "\n")
   seurat.res <- SeuratProcessing(data, needNorm = needNorm, topDEGs = topDEGs, topN.DEG.as.seed = topN.DEG.as.seed)
   markers <- seurat.res$markers
   DEGs <- seurat.res$DEGs
   adata <- seurat.res$adata
-  data <- adata[["RNA"]]@data
+
+  SeuratVersionCheck = as.numeric(strsplit(as.character(packageVersion("Seurat")), "\\.")[[1]][1])
+  if (SeuratVersionCheck == 4) {
+    data <- adata[["RNA"]]@data
+  }else if (SeuratVersionCheck == 5) {
+    data <- adata[["RNA"]]$data
+  }
 
   if(is.null(generalSeedList) == FALSE){
     if(generalSeedList == "generalSeedList"){
@@ -88,6 +106,7 @@ CASCC.featureSelection <- function(data, inputDataType = "well-normalized", attr
   }
 
   # Step 2: adaptive attractor
+  cat("Step 2: applying the adaptive attractor algorithm...", "\n")
   if(is.null(attr.raw) == TRUE){
     res <- scanSeeds.adaptive(data, markers, exponent.max = exponent.max, exponent.min = exponent.min, mc.cores = mc.cores)
   }else {
@@ -96,6 +115,7 @@ CASCC.featureSelection <- function(data, inputDataType = "well-normalized", attr
 
 
   # Step 3: selected features
+  cat("Step 3: selecting features...", "\n")
   # attrs <- collapseAttractorList(res) ## 50 50
   attrs <- collapseAttractorList(res, NumTopFeature=50) # remove the identical attractors
   features <- lapply(attrs, function(x){names(x[1:topAttr])})

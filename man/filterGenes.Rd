@@ -32,6 +32,11 @@ have an expression level > 0 are excluded. Second, to remove genes not
 relevant for characterizing cell types, CASCC filtered out mitochondrial genes, 
 ribosomal genes, and spike-in genes from the analysis by default.
 }
+\examples{
+library("CASCC")
+data("Data_PDAC_peng_2k") 
+data <- filterGenes(Data_PDAC_peng_2k)
+}
 \seealso{
 \code{\link{CASCC.featureSelection}}
 }

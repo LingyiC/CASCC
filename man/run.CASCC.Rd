@@ -30,32 +30,40 @@ run.CASCC(
 
 \item{groundTruth.K}{Default \code{NULL}. The number of clusters. By
 default, CASCC will estimate the number of clusters. Users can manually set
-the number of clusters if they prefer.}
+the number of clusters if they have prior knowledge about the number of clusters.}
 
-\item{attr.raw}{Default \code{NULL}. If users already have attractor
+\item{attr.raw}{Default \code{NULL}. If users already run CASCC and have attractor
 scanning results \code{CASCC.output$fs.res$attrs.raw}, they can provide the
 list of attractors.}
 
-\item{inputDataType}{Default \code{"well-normalized"}.}
+\item{inputDataType}{Input data type. Default is "well-normalized".
+Options: "well-normalized", "needLog2" or "UMI". If the input matrix is
+normalized and log-transformed, use "well-normalized". If the input matrix
+is normalized but not log-transformed, use "needLog2". If the input matrix
+is UMI-count, use "UMI".}
 
 \item{mc.cores}{Default \code{NULL}. The number of cores to be used. By
-default, CASCC use only 1 core.}
+default, CASCC use 2 cores.}
 
-\item{removeMT.RP.ERCC}{Default \code{TRUE}. By default, MT, RP, and ERCC genes
-will be removed.}
+\item{removeMT.RP.ERCC}{Default \code{TRUE}. By default, mitochondrial genes,
+ribosomal genes, and spike-in genes will be removed.}
 
 \item{removeNonProtein}{Default \code{FALSE}. By default, non-protein coding
-genes will not be removed.}
+genes will not be removed.To facilitate the analysis, users can remove them.}
 
 \item{topN.DEG.as.seed}{Default \code{1}. By default, the top 1 DEG of each
-cluster will be used as seeds in the following analysis.}
+initial cluster will be used as seeds in the following analysis.}
 
-\item{exponent.max}{Default \code{10}.}
+\item{generalSeedList}{Seed genes set by users. Default is NULL. For example,
+\code{generalSeedList = c("AMBP", "KRT19", "PRSS1", "CHGB", "RGS5", "LUM", "CDH5", "AIF1", "CD3D", "MS4A1")}.}
+
+\item{exponent.max}{Default \code{10}.To facilitate the analysis of large dataset,
+users can set a smaller value, such as 5.}
 
 \item{exponent.min}{Default \code{2}.}
 
 \item{topDEGs}{Default \code{10}. By default, the top 10 DEGs of each
-cluster will be used as features in the following analysis.}
+initail cluster will be used as features in the following analysis.}
 
 \item{topAttr}{Default \code{50}. By default, the top 50 genes of each
 attractor will be used as features in the following analysis.}
@@ -71,19 +79,34 @@ space. If \code{"feature-matrix"}, the input will be the feature matrix.}
 \item{nPCA}{Default \code{30}. The number of PCA components to be used.}
 
 \item{overlapN}{Default \code{10}. The number of overlapping genes between
-different attractors.}
+different attractors to define duplicated attractors.}
 
-\item{attractorModify.percentage}{Default \code{0}.}
+\item{attractorModify.percentage}{Default \code{0}.
+Remove attractor expressed in less than \code{attractorModify.percentage} percent of cells. This is disabled by default.}
 }
 \value{
 \item{fs.res}{Output of \code{\link{CASCC.featureSelection}}. Step
-1 to step 3 of CASCC.} \item{res.predictK}{Output of
-\code{\link{predictClusterK}}. Step 4 of CASCC.} \item{res.kmeans}{Output
-of run.kmeans function. Kmeans with random centers.
-}
+1 to step 3 of CASCC.}
+\item{res.predictK}{Output of
+\code{\link{predictClusterK}}. Step 4 of CASCC.}
 \item{mainType.output}{Output of \code{\link{kmeansCenterModify}}. Step 5
 of CASCC. Kmeans with fixed centers. }
+\item{res.kmeans}{Output
+of run.kmeans function. Kmeans with random centers.
+}
 }
 \description{
 Run the CASCC package with one line of code.
+}
+\examples{
+# load the toy dataset
+data("Data_PDAC_peng_2k")
+dim(Data_PDAC_peng_2k) # 400 cells and 2000 genes
+
+# run CASCC
+res <- CASCC::run.CASCC(Data_PDAC_peng_2k) # inputDataType `data` is normalized and log-transformed.
+
+# clustering results
+labels <- res$mainType.output$clusteringResults
+
 }

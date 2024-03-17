@@ -38,8 +38,21 @@ the converged attractor.}
 
 \item{mc.cores}{Number of cores to be used. Default is 1.}
 }
+\value{
+\item{attractorSignatureList}{Attractors.} \item{attractorTouchedGenes}{Skipped 
+seeds.} \item{runSeed}{Scanned seeds.} 
+\item{history_exponent}{History
+exponent.} \item{final.exponent}{Final exponent.}
+}
 \description{
 Scan seeds in adaptive manner
+}
+\examples{
+library("CASCC")
+library("cafr")
+data("Data_PDAC_peng_2k") 
+# Find LUM-seeded and RGS5-seeded attractor. LUM gene is a marker of fibroblast cells. RGS5 gene is a marker of pericyte cells.
+attr <- scanSeeds.adaptive(Data_PDAC_peng_2k, c("LUM", "RGS5"))
 }
 \seealso{
 \code{\link{findAttractor.adaptive}}

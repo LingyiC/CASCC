@@ -8,7 +8,7 @@ collapseAttractorList(
   attractorList,
   NumTopFeature = 50,
   outputLength = NULL,
-  verbose = TRUE,
+  verbose = FALSE,
   overlapN = 50,
   removeDominant = FALSE
 )

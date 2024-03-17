@@ -4,15 +4,17 @@
 \alias{attractorPlot}
 \title{Attractor Plot}
 \usage{
-attractorPlot(seuratObj, attr.list, n.col = 4)
+attractorPlot(seuratObj, attr.list, topN = 5, n.col = 4)
 }
 \arguments{
 \item{seuratObj}{A Seurat object. For example,
-\code{CASCC.output$res.predictK$adata}.}
+\code{adata <- CASCC.output$res.predictK$adata}; \code{Idents(adata) <- CASCC.output$mainType.output$clusteringResults}.}
 
-\item{attr.list}{A list of attractors to plot. For example,
+\item{attr.list}{A list of attractors to plot. For example, 
 \code{CASCC.output$mainType.output$attrs.center},
 \code{CASCC.output$fs.res$finalAttrs}.}
+
+\item{topN}{Specify the topN of each attractor to plot.}
 
 \item{n.col}{Specify the number of columns in which the plots should be
 arranged when they are displayed together.}
@@ -20,6 +22,22 @@ arranged when they are displayed together.}
 \description{
 This function colors singel cell on UMAP according to the expression levels
 of co-expressed signatures.
+}
+\examples{
+library(CASCC)
+library(Seurat)
+
+# load the toy dataset
+data("Res_PDAC_peng_2k")
+res <- Res_PDAC_peng_2k
+
+# assign clustering results to adata
+adata <- res$res.predictK$adata # feature-selected UMAP
+Idents(adata) <- res$mainType.output$clusteringResults # this step is necessary 
+
+# plot the attractor plot
+attractorPlot(adata, res$mainType.output$attrs.center, n.col = 4)
+
 }
 \seealso{
 \code{\link{attractorDimplot}}

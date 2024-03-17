@@ -2,8 +2,8 @@
 ##'
 ##' Find adaptive attractors using adaptive attractor finding algorithm. The
 ##' algorithm will scan the exponent from exponent.max to exponent.min with
-##' step.large, and then scan the exponent from exponent.min to exponent.max
-##' with scanning steps. The algorithm will maximize the strength of the
+##' step.large, and then scan the exponent from exponent.max to exponent.min
+##' with step.small. The algorithm will maximize the strength of the
 ##' attractor.
 ##'
 ##'
@@ -26,18 +26,25 @@
 ##' each iteration.
 ##' @param second.idx Default second.idx = 2, the second gene of the metagene
 ##' in each iteration.
-##' @return
+##' @return \item{attractor.final}{Attractor.} \item{scannedSeeds}{Skipped 
+##' seeds.} \item{history_matrix}{History matrix including attractor output using different exponents.} 
+##' \item{history_exponent}{History
+##' exponent.} \item{final.exponent}{Final exponent.}
 ##' @author Lingyi Cai
 ##' @seealso \code{\link{scanSeeds.adaptive}}
 ##' @references
 ##' @examples
-##'
+##' library("CASCC")
+##' library("cafr")
+##' data("Data_PDAC_peng_2k") 
+##' # Find LUM-seeded attractor. LUM gene is a marker of fibroblast cells.
+##' attr <- findAttractor.adaptive(Data_PDAC_peng_2k, "LUM")
+
 ##' @export
 
 findAttractor.adaptive <- function(data, seed, exponent.max = 5, exponent.min = 2, step.large = 1, step.small = 0.1, dominantThreshold = 0.2, seedTopN = 100, compareNth = 10, verbose = FALSE, epsilon = 1e-7, minimize = FALSE, first.idx = 1, second.idx = 2){
 ## change name 011223_algorithm to 011223_findAttractor.adaptive.r
 ## In this version, we make sure the adaptive can work using any exponent.max/exponent.min settings
-
   genesOrder <- rownames(data)
   history_matrix <- matrix(data = NA, nrow = nrow(data), ncol = 1)
   rownames(history_matrix) <- genesOrder

@@ -26,6 +26,6 @@ an attractor is expressed in a cell.}
 between two attractors.}
 }
 \description{
-Remove attractors do not express in at least x% cells, by default we skip 
-this step (percentage = 0%)
+Remove attractors do not express in at least x\% cells, by default we skip
+this step (percentage = 0\%)
 }
