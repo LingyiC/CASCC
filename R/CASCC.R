@@ -112,7 +112,7 @@ run.CASCC <- function(data.lognormcount, groundTruth.K = NULL, attr.raw = NULL, 
     # Step 5 - fixed centers, mainType.output clustering results: res$maintype.output$clusteringResults
     cat("Step 5: performing clustering...", "\n")
     res$mainType.output <- kmeansCenterModify(res)
-    
+
     cat("Done.", "\n")
     return(res)
 }

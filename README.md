@@ -1,21 +1,23 @@
 # CASCC
 
-CASCC, a clusteing method desined to improve biological accuracy using gene co-expression features identified using an unsupervised adaptive attractor algorithm. 
+CASCC, a clustering method designed to improve biological accuracy using gene co-expression features identified using an unsupervised adaptive attractor algorithm. 
 
-The users can refer to our paper for a detailed description of the modeling and applications.
+The users can refer to our manuscript for a detailed description of the modeling and applications. 
 
+<!-- overview -->
 
 # Installation
 ```R
 require(devtools)
+remotes::install_version("Seurat", "4.3.0") # dependency
+install_github("weiyi-bitw/cafr") # dependency
 install_github("LingyiC/CASCC")
-install_github("weiyi-bitw/cafr")  # The 'cafr' R package is required for running CASCC.
-CASCC::checkDependencies()
+CASCC::checkDependencies() 
 ```
-# Tutorials
+# Tutorial
 Vignette: https://rpubs.com/Lingyi/CASCC
 
-Bechmarking:
+# Benchmarking
 https://github.com/LingyiC/CASCC_benchmark
 
 <!-- # Citation 

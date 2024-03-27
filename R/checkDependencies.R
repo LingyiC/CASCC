@@ -9,17 +9,24 @@
 
 
 checkDependencies <- function(){
-  if(!requireNamespace("devtools", quietly = TRUE)){install.packages("devtools")}
-  if(!requireNamespace("remotes", quietly = TRUE)){install.packages("remotes")}
+  # if(!requireNamespace("devtools", quietly = TRUE)){install.packages("devtools")}
+  # if(!requireNamespace("remotes", quietly = TRUE)){install.packages("remotes")}
+
+  checkVersion <- function(x) {
+    tryCatch({
+      packageVersion(x)
+    }, error = function(e) {
+      NA
+    })}
 
   packages <- c("cafr", "Seurat", "SeuratObject")
-  versions <- c(NA, "4.3", "4.1.3")
-  repos <- c(NA, "https://satijalab.r-universe.dev", "https://satijalab.r-universe.dev")
+  versions <- c(checkVersion("cafr"), checkVersion("Seurat"), checkVersion("SeuratObject"))
+  # repos <- c(NA, "https://satijalab.r-universe.dev", "https://satijalab.r-universe.dev")
 
   for (i in seq_along(packages)) {
     package <- packages[i]
     version <- versions[i]
-    repo <- repos[i]
+    # repo <- repos[i]
 
       if (!is.na(version)) {
         cat(paste0(package, " is already installed."), "\n")

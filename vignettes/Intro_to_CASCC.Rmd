@@ -16,7 +16,6 @@ output:
       fig_width: 5
       df_print: paged
       code_folding: show
-      
 vignette: >
   %\VignetteIndexEntry{Introduction to CASCC}
   %\VignetteEngine{knitr::rmarkdown}
@@ -37,11 +36,14 @@ knitr::opts_chunk$set(tidy = FALSE,
                       message = FALSE, error = FALSE, warning = TRUE)
 ```	
 
-# Install CASCC 
-## install R and R package using anaconda (recommended)
+# Installing CASCC 
+CASCC github page: https://github.com/LingyiC/CASCC
+
+## Option 1: installing R and CASCC using anaconda (recommended)
 ```{r, eval = FALSE}
 conda create -n CASCC_env
 source activate CASCC_env
+conda install conda-forge::r-fs # necessary for devtools
 conda install conda-forge::r-devtools
 
 R
@@ -50,42 +52,52 @@ install.packages("rlang",version="1.1.0") # dependency:update rlang package
 remotes::install_version("Seurat", "4.3.0") # dependency
 devtools::install_github("weiyi-bitw/cafr") # dependency
 devtools::install_github("LingyiC/CASCC")
+CASCC::checkDependencies()
 ```
 
-## install in R
+## Option 2: installing in R
 ```{r, eval = FALSE}
 require(devtools)
+remotes::install_version("Seurat", "4.3.0") # dependency
+install_github("weiyi-bitw/cafr") # dependency
 install_github("LingyiC/CASCC")
-checkDependencies() # We highly recommend users to use Seurat V4 instead of V5 as dependency of CASCC. 
+CASCC::checkDependencies() 
 ```
 
 # CASCC tutorial
 
+In this tutorial, we will be analyzing an example dataset from a pancreatic ductal adenocarcinoma (PDAC) patient from the study by [@peng2019single]. This example includes 8 different cell types. The script of generating the example dataset is provided in the "Generating the example dataset" section. 
+
 ## Quick Start - clustering 
-### Run CASCC in one line of code
-```{r, eval=FALSE}
+### Running CASCC in one line of code
+Here we show running CASCC using main function `run.CASCC`. Running CASCC step by step is shown in the "Running CASCC step by step" section. 
+
+
+```{r, eval=TRUE}
 rm(list = ls()); gc()
 library(CASCC)
 library(Seurat)
 set.seed(1)
-## load the toy dataset
+## load the example dataset
 data("Data_PDAC_peng_2k") 
 dim(Data_PDAC_peng_2k) # 400 cells 
 
-## run CASCC
+## running CASCC
+CASCC::checkDependencies() 
 res <- CASCC::run.CASCC(Data_PDAC_peng_2k) # inputDataType `data` is normalized and log-transformed. 
 
 ## clustering results 
 labels <- res$mainType.output$clusteringResults
 ```
 
-```{r, eval=TRUE}
-rm(list = ls()); gc()
-library(CASCC)
-library(Seurat)
-load("/home/lingyi/Documents/reproduce/CASCC/data/Res_PDAC_peng_2k.RData")
-res <- Res_PDAC_peng_2k
-```
+<!-- ### !!!!!!!!!!!!!remove -->
+<!-- ```{r, eval=TRUE} -->
+<!-- rm(list = ls()); gc() -->
+<!-- library(CASCC) -->
+<!-- library(Seurat) -->
+<!-- load("/home/lingyi/Documents/reproduce/CASCC/data/Res_PDAC_peng_2k.RData") -->
+<!-- res <- Res_PDAC_peng_2k -->
+<!-- ``` -->
 
 ### UMAP visualization
 ```{r, fig.width=5, fig.height=4}
@@ -97,10 +109,11 @@ DimPlot(adata)
 ```
 
 ### Attractor co-expression output
+The analysis identifies the presence of eight distinct clusters, each corresponding to a specific attractor, as shown in the table below. We showed the top 10 genes of each attractor, which closely align with recognized cell type markers. From left to right, these are macrophage cells, ductal cell type 1, B cells, endothelial cells, ductal cell type 2, T cells, stellate cells, and fibroblasts. 
 ```{r}
 ## results list
 attr.raw <- res$fs.res$attr.raw # raw attractor scanning results, can be used if rerun CASCC
-attrs <- res$fs.res$attrs # attractors removed identical ones
+# res$fs.res$attrs # attractors removed identical ones
 finalAttrs <- res$fs.res$finalAttrs # filtered attractors 
 
 
@@ -114,10 +127,11 @@ for (attr.ID in paste0("attr_", unlist(lapply(attrs, function(x){names(head(x)[1
 
 colnames(df) <- titles
 
-df[1:10, ] # from left to right, they represent macrophage cell, Ductal cell type 1, B cell, Endotehlial, Ductal cell type 2, T cell, Stellate cell and Fibroblast cell.
+df[1:10, ] # top 10 genes (rows) of each attractor (column)
 ```
 
 ### UMAP, labeled by the attractors
+The identified 8 attractors is using as centers for each cluster. 
 ```{r, fig.width=6, fig.height=4}
 Idents(adata) <- res$mainType.output$clusteringResults
 nClust <- length(unique(Idents(adata)))
@@ -126,13 +140,22 @@ attractorDimplot(adata, attr.list = res$mainType.output$attrs.center, col = myco
 ```
 
 ### Attractor plot  
-Color the cells by the expression of the top 5 genes of each attractor. 
+We color the cells according to the average expression of the top 5 genes in each attractor.
+
 ```{r, fig.width=8, fig.height=6}
 attractorPlot(adata, attrs[1:4], n.col = 2)
 ```
 
-### Understand CASCC output
-CASCC output object:
+
+### Finding differentially expressed genes
+We find differentially expressed genes (DEGs) between the clusters. 
+```{r}
+DEGs <- Seurat::FindAllMarkers(adata, only.pos = T)
+head(DEGs)
+```
+
+### Understanding CASCC output
+CASCC output object is a list in R:
 
 - List of 4
   - fs.res: List of 7
@@ -161,24 +184,23 @@ data("Res_PDAC_peng_2k")
 str(Res_PDAC_peng_2k, max.level = 2)
 ```
 
-## Quick Start - find co-expression signatures 
-
+## Quick Start - finding co-expression signatures 
 We provide an adaptive version of attractor algorithm to find a converged attractor based on the seed gene provided. 
 If users are interested in the co-expression attractor only, they can use the following code to find the co-expression without running the whole CASCC pipeline. 
 
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 library("CASCC")
 library("cafr")
 data("Data_PDAC_peng_2k") 
-# Find LUM-seeded attractor. LUM gene is a marker of fibroblast cells.
-attr.res <- findAttractor.adaptive(Data_PDAC_peng_2k, "LUM")
-
+# Find AIF1-seeded attractor. AIF1 gene is a marker of macrophage cells.
+attr.res <- findAttractor.adaptive(Data_PDAC_peng_2k, "AIF1")
 # co-expression attractor 
-head(attr.res$attractor.final)	
+head(names(attr.res$attractor.final))	
 ```
 
 
-## Run CASCC step by step
+## Running CASCC step by step
+In this section, we show how to run CASCC step by step.
 ```{r, eval = FALSE}
 rm(list = ls()); gc()
 library("CASCC")
@@ -215,8 +237,8 @@ res$mainType.output <- kmeansCenterModify(res)
 
 # Other scripts
 
-## Generate the toy data
-Generate the toy data for the quick start. 
+## Generating the example dataset
+Generate the example dataset for the quick start. 
 
 ```{r, eval = FALSE}
 set.seed(1)
@@ -258,10 +280,12 @@ end_time - start_time
 save(res, file = "./CASCC/data/Res_PDAC_peng_2k.RData")
 
 ```
-## Run CASCC within Seurat workflow
+
+## Running CASCC within Seurat workflow
+Here we show how to run CASCC within Seurat workflow. 
 ```{r, eval = FALSE}
 ## after processed Seurat workflow
-# Seurat V4 is highly recommended!
+# Seurat V4 
 ## Users' SeuratObject 
 SeuratVersionCheck = as.numeric(strsplit(as.character(packageVersion("Seurat")), "\\.")[[1]][1])
 if (SeuratVersionCheck == 4) {
@@ -273,11 +297,12 @@ res <- CASCC::run.CASCC(data)
 Idents(SeuratObject) <- res$mainType.output$clusteringResults 
 SeuratObject
 
-
 ```
 
 
 # Frequently asked questions
+Users can submit questions and feedback to https://github.com/LingyiC/CASCC/issues. 
+
 We welcome any questions and feedback. We will provide a list of frequently asked questions and the answers.
 
 # Session info
@@ -368,3 +393,4 @@ sessionInfo()
 # [115] httpuv_1.6.9                stats4_4.0.5               
 # [117] munsell_0.5.0               viridisLite_0.4.1          
 ```
+# References

@@ -13,14 +13,14 @@
 ##' obtained attractor scanning results \code{CASCC.output$fs.res$attrs.raw},
 ##' they can provide the list of attractors to skip the scanning step.
 ##' @param exponent.max Maximum exponent for adaptive attractor. Default is 10.
-##' To facilitate the analysis of large dataset, 
+##' To facilitate the analysis of large dataset,
 ##' users can set a smaller value, such as 5.
 ##' @param exponent.min Minimum exponent for adaptive attractor. Default is 2.
-##' @param generalSeedList Seed genes set by users. Default is NULL. For example, 
+##' @param generalSeedList Seed genes set by users. Default is NULL. For example,
 ##' \code{generalSeedList = c("AMBP", "KRT19", "PRSS1", "CHGB", "RGS5", "LUM", "CDH5", "AIF1", "CD3D", "MS4A1")}.
 ##' @param mc.cores Number of cores to use.
 ##' @param topDEGs Number of top DEGs in each cluster selected as features.
-##' Default is 10. 
+##' Default is 10.
 ##' @param topAttr Number of top genes in each attractor selected as features.
 ##' Default is 50.
 ##' @param removeMT.RP.ERCC If remove mitochondrial genes, ribosomal genes and
@@ -42,10 +42,10 @@
 ##' @references
 ##' @examples
 ##' library("CASCC")
-##' data("Data_PDAC_peng_2k") 
-##' 
+##' data("Data_PDAC_peng_2k")
+##'
 ##' # Step 0 - Step 3
-##' fs.res <- CASCC.featureSelection(Data_PDAC_peng_2k, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2, 
+##' fs.res <- CASCC.featureSelection(Data_PDAC_peng_2k, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2,
 ##'                                  generalSeedList = NULL, mc.cores = 1, topDEGs = 10, topAttr = 50,
 ##'                                  removeMT.RP.ERCC = TRUE, removeNonProtein = FALSE,
 ##'                                  topN.DEG.as.seed = 1,
@@ -56,8 +56,16 @@
 CASCC.featureSelection <- function(data, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2, generalSeedList = NULL, mc.cores = NULL, topDEGs = 10, topAttr = 50,
                                    removeMT.RP.ERCC = TRUE, topN.DEG.as.seed = 1, removeNonProtein = FALSE, overlapN = 10,
                                    attractorModify.percentage = 0.01){
+
+
+  # Check if version is 4.3.0
+  if (packageVersion("Seurat") != "4.3.0") {
+    stop("Seurat version is not 4.3.0. Please install version 4.3.0.")
+  }
+
   set.seed(1)
   resList <- list()
+
 
   # preprocess-Filter genes
   data <- filterGenes(data, min.cells = 0, removeMT.RP.ERCC = removeMT.RP.ERCC, removeNonProtein = removeNonProtein)

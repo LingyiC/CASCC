@@ -6,7 +6,7 @@ Author: c(person("Lingyi", "Cai", role = c("aut", "cre")),
     person("Dimitris", "Anastassiou", role = "aut"))
 Maintainer: Lingyi Cai <lingyi.cai@columbia.edu>
 Description: Here, we introduce a clustering method, CASCC, designed to improve biological accuracy using gene co-expression features identified using an unsupervised adaptive attractor algorithm.
-Depends: R (>= 3.5.0)
+Depends: R (>= 3.5.0), Seurat (== 4.3.0)
 Imports: 
     cafr, 
     Seurat (== 4.3.0), 
