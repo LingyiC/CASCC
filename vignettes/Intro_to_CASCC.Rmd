@@ -39,7 +39,7 @@ knitr::opts_chunk$set(tidy = FALSE,
 # Installing CASCC 
 CASCC github page: https://github.com/LingyiC/CASCC
 
-## Option 1: installing R and CASCC using anaconda (recommended)
+## Option 1: installing R and CASCC using anaconda
 ```{r, eval = FALSE}
 conda create -n CASCC_env
 source activate CASCC_env

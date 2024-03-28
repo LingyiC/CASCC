@@ -6,6 +6,6 @@ server: rpubs.com
 hostUrl: rpubs.com
 appId: https://api.rpubs.com/api/v1/document/1164079/e5b83d8c3f524f348387248b2a02a356
 bundleId: https://api.rpubs.com/api/v1/document/1164079/e5b83d8c3f524f348387248b2a02a356
-url: http://rpubs.com/publish/claim/1164079/b286d7db30904a589630a2c251604bfb
-when: 1710961681.30795
-lastSyncTime: 1710961681.30797
+url: http://rpubs.com/Lingyi/1164079
+when: 1711587794.91785
+lastSyncTime: 1711587794.91786

@@ -1,4 +1,5 @@
-# CASCC
+# CASCC: A co-expression assisted single-cell RNA-seq data clustering method
+
 
 CASCC, a clustering method designed to improve biological accuracy using gene co-expression features identified using an unsupervised adaptive attractor algorithm. 
 
