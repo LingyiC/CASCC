@@ -3,7 +3,7 @@
 
 CASCC, a clustering method designed to improve biological accuracy using gene co-expression features identified using an unsupervised adaptive attractor algorithm. 
 
-The users can refer to our manuscript for a detailed description of the modeling and applications. 
+The users can refer to our published manuscript, available at [this link](https://doi.org/10.1093/bioinformatics/btae283), for a detailed description of the method. 
 
 <!-- overview -->
 
