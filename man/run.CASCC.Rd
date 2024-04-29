@@ -12,6 +12,9 @@ run.CASCC(
   mc.cores = 2,
   removeMT.RP.ERCC = TRUE,
   removeNonProtein = FALSE,
+  min.diff.pct = 0.5,
+  min.pct = 0.25,
+  logfc.threshold = 0.25,
   topN.DEG.as.seed = 1,
   generalSeedList = NULL,
   exponent.max = 10,
@@ -50,6 +53,15 @@ ribosomal genes, and spike-in genes will be removed.}
 
 \item{removeNonProtein}{Default \code{FALSE}. By default, non-protein coding
 genes will not be removed.To facilitate the analysis, users can remove them.}
+
+\item{min.diff.pct}{Default \code{0.5}. Seurat - Only test genes that show a minimum difference 
+in the fraction of detection between the two groups. Set to 0.5 by default.}
+
+\item{min.pct}{Default \code{0.25}.  Seurat - Only test genes that are detected 
+in a minimum fraction of min.pct cells in either of the two populations.
+Meant to speed up the function by not testing genes that are very infrequently expressed. Default is 0.25.}
+
+\item{logfc.threshold}{Default \code{0.25}. Seurat - The log fold change threshold.}
 
 \item{topN.DEG.as.seed}{Default \code{1}. By default, the top 1 DEG of each
 initial cluster will be used as seeds in the following analysis.}

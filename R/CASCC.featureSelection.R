@@ -55,7 +55,8 @@
 
 CASCC.featureSelection <- function(data, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2, generalSeedList = NULL, mc.cores = NULL, topDEGs = 10, topAttr = 50,
                                    removeMT.RP.ERCC = TRUE, topN.DEG.as.seed = 1, removeNonProtein = FALSE, overlapN = 10,
-                                   attractorModify.percentage = 0.01){
+                                   attractorModify.percentage = 0.01,
+                                   min.diff.pct = 0.5, min.pct = 0.25, logfc.threshold = 0.25){
 
 
   # Check if version is 4.3.0
@@ -81,7 +82,7 @@ CASCC.featureSelection <- function(data, inputDataType = "well-normalized", attr
 
   # Step 1: initial clustering
   cat("Step 1: preparing the seed list...", "\n")
-  seurat.res <- SeuratProcessing(data, needNorm = needNorm, topDEGs = topDEGs, topN.DEG.as.seed = topN.DEG.as.seed)
+  seurat.res <- SeuratProcessing(data, needNorm = needNorm, topDEGs = topDEGs, topN.DEG.as.seed = topN.DEG.as.seed, min.diff.pct = min.diff.pct, min.pct = min.pct, logfc.threshold = logfc.threshold)
   markers <- seurat.res$markers
   DEGs <- seurat.res$DEGs
   adata <- seurat.res$adata

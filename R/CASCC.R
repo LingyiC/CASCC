@@ -28,6 +28,12 @@
 ##' @param exponent.max Default \code{10}.To facilitate the analysis of large dataset,
 ##' users can set a smaller value, such as 5.
 ##' @param exponent.min Default \code{2}.
+##' @param min.diff.pct Default \code{0.5}. Seurat - Only test genes that show a minimum difference 
+##' in the fraction of detection between the two groups. Set to 0.5 by default.
+##' @param min.pct Default \code{0.25}.  Seurat - Only test genes that are detected 
+##' in a minimum fraction of min.pct cells in either of the two populations.
+##' Meant to speed up the function by not testing genes that are very infrequently expressed. Default is 0.25.
+##' @param logfc.threshold Default \code{0.25}. Seurat - The log fold change threshold. 
 ##' @param topDEGs Default \code{10}. By default, the top 10 DEGs of each
 ##' initail cluster will be used as features in the following analysis.
 ##' @param topAttr Default \code{50}. By default, the top 50 genes of each
@@ -69,6 +75,7 @@
 
 run.CASCC <- function(data.lognormcount, groundTruth.K = NULL, attr.raw = NULL, inputDataType = "well-normalized", mc.cores = 2,
                       removeMT.RP.ERCC = TRUE, removeNonProtein = FALSE,
+                      min.diff.pct = 0.5, min.pct = 0.25, logfc.threshold = 0.25,
                       topN.DEG.as.seed = 1, generalSeedList = NULL, exponent.max = 10, exponent.min = 2, topDEGs = 10, topAttr = 50,
                       min.nc_fix = FALSE, if_PCA_input = TRUE, nPCA = 30,
                       overlapN = 10, attractorModify.percentage = 0){
@@ -83,6 +90,7 @@ run.CASCC <- function(data.lognormcount, groundTruth.K = NULL, attr.raw = NULL, 
     data.lognormcount <- as.matrix(data.lognormcount)
     fs.res <- CASCC.featureSelection(data.lognormcount, inputDataType = inputDataType, attr.raw = attr.raw, exponent.max = exponent.max, exponent.min = exponent.min, generalSeedList = generalSeedList, mc.cores = mc.cores, topDEGs = topDEGs, topAttr = topAttr,
                                      removeMT.RP.ERCC = removeMT.RP.ERCC, removeNonProtein = removeNonProtein,
+                                     min.diff.pct = min.diff.pct, min.pct = min.pct, logfc.threshold = logfc.threshold,
                                      topN.DEG.as.seed = topN.DEG.as.seed,
                                      overlapN = overlapN, attractorModify.percentage = attractorModify.percentage)
     adata  <- fs.res$adata;

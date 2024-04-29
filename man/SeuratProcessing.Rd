@@ -10,6 +10,8 @@ SeuratProcessing(
   resolution = 2,
   needNorm = FALSE,
   min.diff.pct = 0.5,
+  min.pct = 0.25,
+  logfc.threshold = 0.25,
   topDEGs = 10
 )
 }
@@ -38,7 +40,7 @@ workflow to the gene expression matrix.
 }
 \examples{
 library("CASCC")
-data("Data_PDAC_peng_2k") 
+data("Data_PDAC_peng_2k")
 data <- filterGenes(Data_PDAC_peng_2k)
 seuratObject <- SeuratProcessing(data, topN.DEG.as.seed = 1, resolution = 2, needNorm = FALSE, min.diff.pct = 0.5, topDEGs = 10)
 }

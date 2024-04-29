@@ -22,13 +22,13 @@
 ##' @references
 ##' @examples
 ##' library("CASCC")
-##' data("Data_PDAC_peng_2k") 
+##' data("Data_PDAC_peng_2k")
 ##' data <- filterGenes(Data_PDAC_peng_2k)
 ##' seuratObject <- SeuratProcessing(data, topN.DEG.as.seed = 1, resolution = 2, needNorm = FALSE, min.diff.pct = 0.5, topDEGs = 10)
 ##' @export
 
 
-SeuratProcessing <- function(data, topN.DEG.as.seed = 1, resolution = 2, needNorm = FALSE, min.diff.pct = 0.5, topDEGs = 10){
+SeuratProcessing <- function(data, topN.DEG.as.seed = 1, resolution = 2, needNorm = FALSE, min.diff.pct = 0.5, min.pct = 0.25, logfc.threshold = 0.25, topDEGs = 10){
 ##======================================================================
 ## SeuratProcessing define the seeds
 ##======================================================================
@@ -45,9 +45,9 @@ SeuratProcessing <- function(data, topN.DEG.as.seed = 1, resolution = 2, needNor
   }
 
   if(ncol(data) > 300){
-    # Check Seurat version, add data layer 
+    # Check Seurat version, add data layer
     if ( SeuratVersionCheck == 5) {
-       adata[["RNA"]]$data <- data 
+       adata[["RNA"]]$data <- data
     }
 
     adata <- Seurat::FindVariableFeatures(adata, selection.method = "vst", nfeatures = 2000, verbose = F)
@@ -57,21 +57,21 @@ SeuratProcessing <- function(data, topN.DEG.as.seed = 1, resolution = 2, needNor
     adata <- Seurat::FindClusters(adata, resolution = resolution, verbose = F)
     adata <- Seurat::RunUMAP(adata, dim = 1:10, verbose = F)
   }else {
-    # Check Seurat version, add data layer 
+    # Check Seurat version, add data layer
     if (SeuratVersionCheck == 5) {
-      adata[["RNA"]]$data <- data 
+      adata[["RNA"]]$data <- data
     }
     adata <- Seurat::FindVariableFeatures(adata, selection.method = "vst", nfeatures = 2000, verbose = F)
     adata <- Seurat::ScaleData(adata, verbose = F)
     adata <- Seurat::RunPCA(adata, verbose = F)
     adata <- Seurat::RunUMAP(adata, dim = 1:10, verbose = F)
-    
+
     if (SeuratVersionCheck == 4) {
       data <- adata[["RNA"]]@data
     }else if (SeuratVersionCheck == 5) {
       data <- adata[["RNA"]]$data
     }
-    
+
     res_kmeans <- run.kmeans(data[Seurat::VariableFeatures(adata), ], 10)
     Seurat::Idents(adata) <- as.factor(res_kmeans$clusteringResults)
   }
@@ -79,13 +79,13 @@ SeuratProcessing <- function(data, topN.DEG.as.seed = 1, resolution = 2, needNor
 
 
 ## Method
-  dfMarkers <-  Seurat::FindAllMarkers(adata, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, min.diff.pct = min.diff.pct, verbose = F)
+  dfMarkers <-  Seurat::FindAllMarkers(adata, only.pos = TRUE, min.pct = min.pct, logfc.threshold = logfc.threshold, min.diff.pct = min.diff.pct, verbose = F)
   if(dim(dfMarkers)[1] < (length(unique(Seurat::Idents(adata)))*5)){
     # Nonetheless, if the dataset lacks DEGs under this condition, for example,
     # when the average number of DEGs detected in each cluster is below 5,
     # we remove this strict restriction and include all genes in the differential expression analysis.
     # each cluster has at least ~ 5 DEGs
-    dfMarkers <- Seurat::FindAllMarkers(adata, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, min.diff.pct = -Inf)
+    dfMarkers <- Seurat::FindAllMarkers(adata, only.pos = TRUE, min.pct = min.pct, logfc.threshold = logfc.threshold, min.diff.pct = -Inf)
     print("Warning: the dataset lacks DEGs under strict restriction")
   }
   library("dplyr", quietly = T)

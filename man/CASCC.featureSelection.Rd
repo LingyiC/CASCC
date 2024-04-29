@@ -18,7 +18,10 @@ CASCC.featureSelection(
   topN.DEG.as.seed = 1,
   removeNonProtein = FALSE,
   overlapN = 10,
-  attractorModify.percentage = 0.01
+  attractorModify.percentage = 0.01,
+  min.diff.pct = 0.5,
+  min.pct = 0.25,
+  logfc.threshold = 0.25
 )
 }
 \arguments{
@@ -35,12 +38,12 @@ obtained attractor scanning results \code{CASCC.output$fs.res$attrs.raw},
 they can provide the list of attractors to skip the scanning step.}
 
 \item{exponent.max}{Maximum exponent for adaptive attractor. Default is 10.
-To facilitate the analysis of large dataset, 
+To facilitate the analysis of large dataset,
 users can set a smaller value, such as 5.}
 
 \item{exponent.min}{Minimum exponent for adaptive attractor. Default is 2.}
 
-\item{generalSeedList}{Seed genes set by users. Default is NULL. For example, 
+\item{generalSeedList}{Seed genes set by users. Default is NULL. For example,
 \code{generalSeedList = c("AMBP", "KRT19", "PRSS1", "CHGB", "RGS5", "LUM", "CDH5", "AIF1", "CD3D", "MS4A1")}.}
 
 \item{mc.cores}{Number of cores to use.}
@@ -77,10 +80,10 @@ This function help select features for clustering.
 }
 \examples{
 library("CASCC")
-data("Data_PDAC_peng_2k") 
+data("Data_PDAC_peng_2k")
 
 # Step 0 - Step 3
-fs.res <- CASCC.featureSelection(Data_PDAC_peng_2k, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2, 
+fs.res <- CASCC.featureSelection(Data_PDAC_peng_2k, inputDataType = "well-normalized", attr.raw = NULL, exponent.max = 10, exponent.min = 2,
                                  generalSeedList = NULL, mc.cores = 1, topDEGs = 10, topAttr = 50,
                                  removeMT.RP.ERCC = TRUE, removeNonProtein = FALSE,
                                  topN.DEG.as.seed = 1,
